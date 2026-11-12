@@ -1,0 +1,25 @@
+== case3 continuous push (nfft=128 overlap=50% hop=64) ==
+seg  0 | out_len=  64 | max_err=2.533e-07
+seg  1 | out_len=  64 | max_err=2.384e-07
+seg  2 | out_len=  64 | max_err=2.384e-07
+seg  3 | out_len=  64 | max_err=1.788e-07
+seg  4 | out_len=  64 | max_err=2.384e-07
+seg  5 | out_len=  64 | max_err=2.384e-07
+seg  6 | out_len=  64 | max_err=1.639e-07
+seg  7 | out_len=  64 | max_err=1.788e-07
+seg  8 | out_len=  64 | max_err=2.384e-07
+seg  9 | out_len=  64 | max_err=2.384e-07
+seg 10 | out_len=  64 | max_err=2.384e-07
+seg 11 | out_len=  64 | max_err=2.980e-07
+seg 12 | out_len=  64 | max_err=2.384e-07
+seg 13 | out_len=  64 | max_err=2.384e-07
+seg 14 | out_len=  64 | max_err=3.576e-07
+seg 15 | out_len=  64 | max_err=2.384e-07
+seg 16 | out_len=  64 | max_err=1.788e-07
+seg 17 | out_len=  64 | max_err=2.384e-07
+seg 18 | out_len=  64 | max_err=2.384e-07
+seg 19 | out_len=  64 | max_err=2.384e-07
+seg 20 | out_len=  64 | max_err=1.788e-07
+seg 21 | out_len=  64 | max_err=2.384e-07
+seg 22 | out_len=  64 | max_err=2.384e-07
+seg 23 | out_len=  64 | max_err=1.192e-07
