@@ -1,0 +1,25 @@
+==== Hann window (n=64) ====
+symmetry check: max |w[k]-w[n-1-k]| = 0.000e+00 -> PASS (symmetric)
+energy: sum(w^2) = 23.6250, mean(w^2) = 0.3691
+sidelobe estimate: first peak ~ -31.9 dB
+apply/unapply roundtrip max error: 2.980e-08
+
+==== Hamming window (n=64) ====
+symmetry check: max |w[k]-w[n-1-k]| = 0.000e+00 -> PASS (symmetric)
+energy: sum(w^2) = 25.0426, mean(w^2) = 0.3913
+sidelobe estimate: first peak ~ -42.5 dB
+apply/unapply roundtrip max error: 2.980e-08
+
+==== Blackman window (n=64) ====
+symmetry check: max |w[k]-w[n-1-k]| = 0.000e+00 -> PASS (symmetric)
+energy: sum(w^2) = 19.1898, mean(w^2) = 0.2998
+sidelobe estimate: first peak ~ -58.7 dB
+apply/unapply roundtrip max error: 2.980e-08
+
+==== rectangular window (n=64) ====
+symmetry check: max |w[k]-w[n-1-k]| = 0.000e+00 -> PASS (symmetric)
+energy: sum(w^2) = 64.0000, mean(w^2) = 1.0000
+sidelobe estimate: first peak ~ -13.5 dB
+apply/unapply roundtrip max error: 0.000e+00
+
+cache check: repeated call reuses table (PASS), rect cache pointer distinct (PASS)

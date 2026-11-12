@@ -1,0 +1,64 @@
+rm -f *.o *.a *.so *.so.*
+cd test && make clean
+make[1]: Entering directory '/home/ys/feedback/uidreczz28YntYa1IK3/test'
+rm -f *~ bm-* st-* tr-* kf-* tkfc-* ff-* fastfilt-* *.pyc *.pyo *.dat testcpp-* testsimd testsimd-* _test_library_dummy _test_library_dummy.c
+make[1]: Leaving directory '/home/ys/feedback/uidreczz28YntYa1IK3/test'
+cd tools && make clean
+make[1]: Entering directory '/home/ys/feedback/uidreczz28YntYa1IK3/tools'
+rm -f *~ fft fft-* fastconv fastconv-* fastconvr fastconvr-* psdpng psdpng-* _test_library_dummy _test_library_dummy.c
+make[1]: Leaving directory '/home/ys/feedback/uidreczz28YntYa1IK3/tools'
+rm -f kiss_fft*.tar.gz *~ *.pyc kiss_fft*.zip
+cc -Wall -fPIC \
+	-o kfc.c.o \
+	 -Dkiss_fft_scalar=float -DKISS_FFT_SHARED -DKISS_FFT_BUILD \
+	-c kfc.c
+cc -Wall -fPIC \
+	-o kiss_fft.c.o \
+	 -Dkiss_fft_scalar=float -DKISS_FFT_SHARED -DKISS_FFT_BUILD \
+	-c kiss_fft.c
+cc -Wall -fPIC \
+	-o kiss_fftnd.c.o \
+	 -Dkiss_fft_scalar=float -DKISS_FFT_SHARED -DKISS_FFT_BUILD \
+	-c kiss_fftnd.c
+cc -Wall -fPIC \
+	-o kiss_fftndr.c.o \
+	 -Dkiss_fft_scalar=float -DKISS_FFT_SHARED -DKISS_FFT_BUILD \
+	-c kiss_fftndr.c
+cc -Wall -fPIC \
+	-o kiss_fftr.c.o \
+	 -Dkiss_fft_scalar=float -DKISS_FFT_SHARED -DKISS_FFT_BUILD \
+	-c kiss_fftr.c
+cc -shared -Wl,-soname,libkissfft-float.so.131 -o libkissfft-float.so.131.1.0 kfc.c.o kiss_fft.c.o kiss_fftnd.c.o kiss_fftndr.c.o kiss_fftr.c.o
+ln -sf libkissfft-float.so.131.1.0 libkissfft-float.so.131
+ln -sf libkissfft-float.so.131.1.0 libkissfft-float.so
+TwoToneTest: snr ranges from 139dB to 148dB
+sizeof(kiss_fft_scalar) = 4
+nfft=120, inverse=0, snr=138.962
+nfft=120, inverse=1, snr=138.184
+kfc cache self-test: PASS
+==== Hann window (n=64) ====
+symmetry check: max |w[k]-w[n-1-k]| = 0.000e+00 -> PASS (symmetric)
+energy: sum(w^2) = 23.6250, mean(w^2) = 0.3691
+sidelobe estimate: first peak ~ -31.9 dB
+apply/unapply roundtrip max error: 2.980e-08
+
+==== Hamming window (n=64) ====
+symmetry check: max |w[k]-w[n-1-k]| = 0.000e+00 -> PASS (symmetric)
+energy: sum(w^2) = 25.0426, mean(w^2) = 0.3913
+sidelobe estimate: first peak ~ -42.5 dB
+apply/unapply roundtrip max error: 2.980e-08
+
+==== Blackman window (n=64) ====
+symmetry check: max |w[k]-w[n-1-k]| = 0.000e+00 -> PASS (symmetric)
+energy: sum(w^2) = 19.1898, mean(w^2) = 0.2998
+sidelobe estimate: first peak ~ -58.7 dB
+apply/unapply roundtrip max error: 2.980e-08
+
+==== rectangular window (n=64) ====
+symmetry check: max |w[k]-w[n-1-k]| = 0.000e+00 -> PASS (symmetric)
+energy: sum(w^2) = 64.0000, mean(w^2) = 1.0000
+sidelobe estimate: first peak ~ -13.5 dB
+apply/unapply roundtrip max error: 0.000e+00
+
+cache check: repeated call reuses table (PASS), rect cache pointer distinct (PASS)
+symmetry: 4/4 windows PASS; cache: 2/2 checks PASS
