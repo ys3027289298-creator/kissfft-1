@@ -1,0 +1,34 @@
+[23:35:50] 1/4 build shared library (make all, float)
+cc -Wall -fPIC \
+	-o kfc.c.o \
+	 -Dkiss_fft_scalar=float -DKISS_FFT_SHARED -DKISS_FFT_BUILD \
+	-c kfc.c
+cc -Wall -fPIC \
+	-o kiss_fft.c.o \
+	 -Dkiss_fft_scalar=float -DKISS_FFT_SHARED -DKISS_FFT_BUILD \
+	-c kiss_fft.c
+cc -Wall -fPIC \
+	-o kiss_fftnd.c.o \
+	 -Dkiss_fft_scalar=float -DKISS_FFT_SHARED -DKISS_FFT_BUILD \
+	-c kiss_fftnd.c
+cc -Wall -fPIC \
+	-o kiss_fftndr.c.o \
+	 -Dkiss_fft_scalar=float -DKISS_FFT_SHARED -DKISS_FFT_BUILD \
+	-c kiss_fftndr.c
+cc -Wall -fPIC \
+	-o kiss_fftr.c.o \
+	 -Dkiss_fft_scalar=float -DKISS_FFT_SHARED -DKISS_FFT_BUILD \
+	-c kiss_fftr.c
+cc -shared -Wl,-soname,libkissfft-float.so.131 -o libkissfft-float.so.131.1.0 kfc.c.o kiss_fft.c.o kiss_fftnd.c.o kiss_fftndr.c.o kiss_fftr.c.o
+ln -sf libkissfft-float.so.131.1.0 libkissfft-float.so.131
+ln -sf libkissfft-float.so.131.1.0 libkissfft-float.so
+[23:35:58] 2/4 build bundled example test/tr-float (even control)
+[23:36:07] 3/4 four cases: 1001, 999, even control, inverse round-trip
+nfft=1000, inverse=0, snr=136.363
+10000 complex ffts took 0.14s, real took 0.08s
+nfft=1000, inverse=1, snr=134.57
+  n= 1001 bins= 501 forward_rel_err_vs_padded_even=0.000e+00
+  n=  999 bins= 500 forward_rel_err_vs_padded_even=0.000e+00
+  n=   37 bins=  19 norm_coef=1/37=2.703e-02 max_abs_err=8.862e-07 rel=3.672e-07
+  all cases within tolerance
+[23:36:13] 4/4 summary
