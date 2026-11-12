@@ -1,0 +1,33 @@
+
+==================== 1/6 需求与方案：新增独立 Q15 定点 FFT（仅 2 个新文件） ====================
+kiss_fft_q15.c
+kiss_fft_q15.h
+
+==================== 2/6 仓库自带示例回归：float 库 + twotonetest ====================
+TwoToneTest: snr ranges from 140dB to 548dB
+sizeof(kiss_fft_scalar) = 4
+
+==================== 3/6 编译新模块：c89/c99 双标准，零警告 ====================
+c89/c99 object build: OK
+
+==================== 4/6 自带 selftest 生成测试素材并构建（宏开关，非独立演示程序） ====================
+built /tmp/q15_demo_build/q15_selftest
+
+==================== 5/6 四个用例：256 点 / 1024 点 / 满幅 / 小幅，打印 SNR、最大误差、溢出次数 ====================
+Q15 FFT self-test: SNR vs float DFT, max error in int16 LSB
+
+--- case1 256-point (N=256, amp=2000, scaled) ---
+SNR=68.50 dB  max_err=40.88 (int16 LSB)  overflows=0  shifts=3
+
+--- case2 1024-point (N=1024, amp=2000, scaled) ---
+SNR=62.39 dB  max_err=182.26 (int16 LSB)  overflows=0  shifts=5
+
+--- case3 full-scale (N=256, amp=32767, unscaled) ---
+SNR=0.07 dB  max_err=3993632.49 (int16 LSB)  overflows=569  shifts=0
+
+--- case4 small-signal (N=256, amp=16, scaled) ---
+SNR=35.16 dB  max_err=11.97 (int16 LSB)  overflows=0  shifts=0
+
+
+==================== 6/6 结论：饱和蝶形 + 块浮点缩放 + 定点旋转因子表，误差可量化 ====================
+scaled 模式高 SNR 且无溢出；unscaled 满幅模式暴露并统计饱和次数。
