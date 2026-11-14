@@ -1,0 +1,10 @@
+prefix=/usr/local
+libdir=${prefix}/lib
+includedir=${prefix}/include
+
+Name: kissfft
+Description: A Fast Fourier Transform (FFT) library that tries to Keep it Simple, Stupid
+Version: 131.1.0
+
+Libs:  -L${libdir} -lkissfft-int32_t
+Cflags: -I${includedir}/kissfft  -DFIXED_POINT=32 -DKISS_FFT_SHARED

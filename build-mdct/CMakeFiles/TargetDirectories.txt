@@ -1,0 +1,7 @@
+/home/ys/feedback/uidreczz28ZQevZPRyb/build-mdct/CMakeFiles/kissfft.dir
+/home/ys/feedback/uidreczz28ZQevZPRyb/build-mdct/CMakeFiles/edit_cache.dir
+/home/ys/feedback/uidreczz28ZQevZPRyb/build-mdct/CMakeFiles/rebuild_cache.dir
+/home/ys/feedback/uidreczz28ZQevZPRyb/build-mdct/CMakeFiles/list_install_components.dir
+/home/ys/feedback/uidreczz28ZQevZPRyb/build-mdct/CMakeFiles/install.dir
+/home/ys/feedback/uidreczz28ZQevZPRyb/build-mdct/CMakeFiles/install/local.dir
+/home/ys/feedback/uidreczz28ZQevZPRyb/build-mdct/CMakeFiles/install/strip.dir

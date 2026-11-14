@@ -204,7 +204,7 @@ export TYPEFLAGS
 # Target: "make all"
 #
 
-all: kfc.c.o kiss_fft.c.o kiss_fftnd.c.o kiss_fftndr.c.o kiss_fftr.c.o
+all: kfc.c.o kiss_fft.c.o kiss_mdct.c.o kiss_fftnd.c.o kiss_fftndr.c.o kiss_fftr.c.o
 ifneq ($(KISSFFT_STATIC), 1)
 	$(CC) $(KISSFFTLIB_FLAGS) -o $(KISSFFTLIB_NAME) $^
   ifneq ($(shell uname -s),Darwin)
@@ -226,6 +226,7 @@ install: all
 	$(INSTALL) -Dt $(ABS_PKGINCLUDEDIR) -m 644 \
 		kiss_fft.h \
 		kissfft.hh \
+		kiss_mdct.h \
 		kiss_fftnd.h \
 		kiss_fftndr.h \
 		kiss_fftr.h
