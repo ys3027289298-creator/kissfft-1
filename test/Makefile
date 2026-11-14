@@ -45,6 +45,7 @@ ifneq ($(KISSFFT_OPENMP),1)
 	TESTREAL = tr-$(KISSFFT_DATATYPE)
 	TESTKFC = tkfc-$(KISSFFT_DATATYPE)
 	TESTFASTFILT = fastfilt-$(KISSFFT_DATATYPE)
+	TESTCONV = tc-$(KISSFFT_DATATYPE)
 	TESTCPP = testcpp-$(KISSFFT_DATATYPE)
 	TESTSIMD = testsimd
 else
@@ -54,6 +55,7 @@ else
 	TESTREAL = tr-$(KISSFFT_DATATYPE)-openmp
 	TESTKFC = tkfc-$(KISSFFT_DATATYPE)-openmp
 	TESTFASTFILT = fastfilt-$(KISSFFT_DATATYPE)-openmp
+	TESTCONV = tc-$(KISSFFT_DATATYPE)-openmp
 	TESTCPP = testcpp-$(KISSFFT_DATATYPE)-openmp
 	TESTSIMD = testsimd-openmp
 	CFLAGS += -fopenmp
@@ -103,7 +105,7 @@ endif
 # Target: "make all"
 #
 
-all: $(BENCHKISS) $(SELFTEST) $(BENCHFFTW) $(TESTREAL) $(TESTKFC) $(TESTFASTFILT)
+all: $(BENCHKISS) $(SELFTEST) $(BENCHFFTW) $(TESTREAL) $(TESTKFC) $(TESTFASTFILT) $(TESTCONV)
 
 #
 # Individual test make rules
@@ -117,6 +119,9 @@ $(TESTKFC): ../kfc.c
 
 $(TESTREAL): test_real.c
 	$(CC) -o $@ $(CFLAGS) $(TYPEFLAGS) $< -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
+
+$(TESTCONV): test_conv.c ../tools/kiss_conv.c
+	$(CC) -o $@ $(CFLAGS) $(TYPEFLAGS) $^ -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
 
 $(BENCHKISS): benchkiss.c pstats.c
 	$(CC) -o $@ $(CFLAGS) $(TYPEFLAGS)  $^ -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
@@ -175,6 +180,8 @@ endif
 	@LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(SELFTEST)
 	$(warning ======real FFT (type= $(KISSFFT_DATATYPE) ))
 	@LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(TESTREAL)
+	$(warning ======FFT-based convolution & autocorrelation (type= $(KISSFFT_DATATYPE) ))
+	@LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(TESTCONV)
 	$(warning ======timing test (type=$(KISSFFT_DATATYPE)))
 	@LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(BENCHKISS) -x $(NUMFFTS) -n $(NFFT)
 	@[ -x ./$(BENCHFFTW) ] && LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(BENCHFFTW) -x $(NUMFFTS) -n $(NFFT) || true
@@ -186,4 +193,4 @@ endif
 #
 
 clean:
-	rm -f *~ bm-* st-* tr-* kf-* tkfc-* ff-* fastfilt-* *.pyc *.pyo *.dat testcpp-* testsimd testsimd-* _test_library_dummy _test_library_dummy.c
+	rm -f *~ bm-* st-* tr-* kf-* tkfc-* tc-* ff-* fastfilt-* *.pyc *.pyo *.dat testcpp-* testsimd testsimd-* _test_library_dummy _test_library_dummy.c
