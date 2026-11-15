@@ -45,6 +45,7 @@ ifneq ($(KISSFFT_OPENMP),1)
 	TESTREAL = tr-$(KISSFFT_DATATYPE)
 	TESTKFC = tkfc-$(KISSFFT_DATATYPE)
 	TESTFASTFILT = fastfilt-$(KISSFFT_DATATYPE)
+	TESTTUNER = tt-$(KISSFFT_DATATYPE)
 	TESTCPP = testcpp-$(KISSFFT_DATATYPE)
 	TESTSIMD = testsimd
 else
@@ -54,6 +55,7 @@ else
 	TESTREAL = tr-$(KISSFFT_DATATYPE)-openmp
 	TESTKFC = tkfc-$(KISSFFT_DATATYPE)-openmp
 	TESTFASTFILT = fastfilt-$(KISSFFT_DATATYPE)-openmp
+	TESTTUNER = tt-$(KISSFFT_DATATYPE)-openmp
 	TESTCPP = testcpp-$(KISSFFT_DATATYPE)-openmp
 	TESTSIMD = testsimd-openmp
 	CFLAGS += -fopenmp
@@ -124,6 +126,16 @@ $(BENCHKISS): benchkiss.c pstats.c
 $(TESTFASTFILT): ../tools/fftutil.c
 	$(CC) -o $@ $(CFLAGS)  -DKFC_TEST $(TYPEFLAGS) $^ -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
 
+$(TESTTUNER): tunertest.c ../tools/kiss_tuner.c ../tools/kiss_tuner.h
+	$(CC) -o $@ $(CFLAGS) $(TYPEFLAGS) tunertest.c ../tools/kiss_tuner.c -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
+
+#
+# Target: "make tunertest" (pitch estimation pipeline demo/self-test)
+#
+
+tunertest: $(TESTTUNER)
+	LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(TESTTUNER) $(MEDIAN_WINDOW)
+
 $(BENCHFFTW): benchfftw.c pstats.c
 	$(warning ======attempting to build FFTW benchmark)
 ifeq ($(LIBFFTW_MISSING), 0)
@@ -186,4 +198,4 @@ endif
 #
 
 clean:
-	rm -f *~ bm-* st-* tr-* kf-* tkfc-* ff-* fastfilt-* *.pyc *.pyo *.dat testcpp-* testsimd testsimd-* _test_library_dummy _test_library_dummy.c
+	rm -f *~ bm-* st-* tr-* tt-* kf-* tkfc-* ff-* fastfilt-* *.pyc *.pyo *.dat testcpp-* testsimd testsimd-* _test_library_dummy _test_library_dummy.c

@@ -274,6 +274,13 @@ testsingle:
 	$(MAKE) -C test CFLAGADD="$(CFLAGADD)" test testcpp
 
 #
+# Target: "make tunertest"
+#
+
+tunertest: all
+	$(MAKE) -C test CFLAGADD="$(CFLAGADD)" tunertest
+
+#
 # Target: "make testall"
 #
 
