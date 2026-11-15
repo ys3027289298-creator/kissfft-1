@@ -47,6 +47,7 @@ ifneq ($(KISSFFT_OPENMP),1)
 	TESTFASTFILT = fastfilt-$(KISSFFT_DATATYPE)
 	TESTCPP = testcpp-$(KISSFFT_DATATYPE)
 	TESTSIMD = testsimd
+	TESTGOERTZEL = tg-$(KISSFFT_DATATYPE)
 else
 	BENCHKISS = bm-kiss-$(KISSFFT_DATATYPE)-openmp
 	BENCHFFTW = bm-fftw-$(KISSFFT_DATATYPE)-openmp
@@ -56,6 +57,7 @@ else
 	TESTFASTFILT = fastfilt-$(KISSFFT_DATATYPE)-openmp
 	TESTCPP = testcpp-$(KISSFFT_DATATYPE)-openmp
 	TESTSIMD = testsimd-openmp
+	TESTGOERTZEL = tg-$(KISSFFT_DATATYPE)-openmp
 	CFLAGS += -fopenmp
 	CXXFLAGS += -fopenmp
 endif
@@ -124,6 +126,12 @@ $(BENCHKISS): benchkiss.c pstats.c
 $(TESTFASTFILT): ../tools/fftutil.c
 	$(CC) -o $@ $(CFLAGS)  -DKFC_TEST $(TYPEFLAGS) $^ -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
 
+$(TESTGOERTZEL): test_goertzel.c ../kiss_goertzel.c
+	$(CC) -o $@ $(CFLAGS) $(TYPEFLAGS) $^ -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
+
+testgoertzel: $(TESTGOERTZEL)
+	LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(TESTGOERTZEL)
+
 $(BENCHFFTW): benchfftw.c pstats.c
 	$(warning ======attempting to build FFTW benchmark)
 ifeq ($(LIBFFTW_MISSING), 0)
@@ -186,4 +194,4 @@ endif
 #
 
 clean:
-	rm -f *~ bm-* st-* tr-* kf-* tkfc-* ff-* fastfilt-* *.pyc *.pyo *.dat testcpp-* testsimd testsimd-* _test_library_dummy _test_library_dummy.c
+	rm -f *~ bm-* st-* tr-* kf-* tkfc-* tg-* ff-* fastfilt-* *.pyc *.pyo *.dat testcpp-* testsimd testsimd-* _test_library_dummy _test_library_dummy.c
