@@ -37,12 +37,14 @@ FFTUTIL = fft-$(KISSFFT_DATATYPE)
 FASTFILT = fastconv-$(KISSFFT_DATATYPE)
 FASTFILTREAL = fastconvr-$(KISSFFT_DATATYPE)
 PSDPNG = psdpng-$(KISSFFT_DATATYPE)
+CEPSTRUM = cepstrum-$(KISSFFT_DATATYPE)
 DUMPHDR = dumphdr-$(KISSFFT_DATATYPE)
 else
 FFTUTIL = fft-$(KISSFFT_DATATYPE)-openmp
 FASTFILT = fastconv-$(KISSFFT_DATATYPE)-openmp
 FASTFILTREAL = fastconvr-$(KISSFFT_DATATYPE)-openmp
 PSDPNG = psdpng-$(KISSFFT_DATATYPE)-openmp
+CEPSTRUM = cepstrum-$(KISSFFT_DATATYPE)-openmp
 DUMPHDR = dumphdr-$(KISSFFT_DATATYPE)-openmp
 endif
 
@@ -50,7 +52,7 @@ endif
 # Target: "make all"
 #
 
-all: $(FFTUTIL) $(FASTFILT) $(FASTFILTREAL) $(PSDPNG)
+all: $(FFTUTIL) $(FASTFILT) $(FASTFILTREAL) $(PSDPNG) $(CEPSTRUM)
 #	$(DUMPHDR)
 
 #
@@ -64,6 +66,9 @@ $(FASTFILT): kiss_fastfir.c
 	$(CC) -o $@ $(CFLAGS) -I.. $(TYPEFLAGS) $<  -DFAST_FILT_UTIL -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
 
 $(FFTUTIL): fftutil.c
+	$(CC) -o $@ $(CFLAGS) -I.. $(TYPEFLAGS) $< -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
+
+$(CEPSTRUM): kiss_cepstrum.c
 	$(CC) -o $@ $(CFLAGS) -I.. $(TYPEFLAGS) $< -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
 
 $(PSDPNG): psdpng.c
@@ -98,4 +103,4 @@ endif
 #
 
 clean:
-	rm -f *~ fft fft-* fastconv fastconv-* fastconvr fastconvr-* psdpng psdpng-* _test_library_dummy _test_library_dummy.c
+	rm -f *~ fft fft-* fastconv fastconv-* fastconvr fastconvr-* psdpng psdpng-* cepstrum cepstrum-* _test_library_dummy _test_library_dummy.c

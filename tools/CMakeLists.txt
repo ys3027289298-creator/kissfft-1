@@ -6,7 +6,9 @@ target_compile_definitions(fastconv PRIVATE FAST_FILT_UTIL)
 
 add_kissfft_executable(fft fftutil.c)
 
-install(TARGETS fastconv fastconvr fft
+add_kissfft_executable(cepstrum kiss_cepstrum.c)
+
+install(TARGETS fastconv fastconvr fft cepstrum
         ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
         LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
         RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
