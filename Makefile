@@ -151,6 +151,19 @@ ifneq ($(KISSFFT_STATIC), 1)
 	TYPEFLAGS += -DKISS_FFT_SHARED
 endif
 
+#
+# The binary16 input/output layer (kiss_fft_f16.c) wraps the float32 engine,
+# so it is part of the library only for the float datatype.  The engine
+# sources themselves are not modified.
+#
+
+ifeq "$(KISSFFT_DATATYPE)" "float"
+	KISSFFT_F16_OBJ = kiss_fft_f16.c.o
+else
+	KISSFFT_F16_OBJ =
+endif
+export KISSFFT_F16_OBJ
+
 ifeq ($(KISSFFT_USE_ALLOCA), 1)
 	TYPEFLAGS += -DKISS_FFT_USE_ALLOCA=1
 endif
@@ -204,7 +217,7 @@ export TYPEFLAGS
 # Target: "make all"
 #
 
-all: kfc.c.o kiss_fft.c.o kiss_fftnd.c.o kiss_fftndr.c.o kiss_fftr.c.o
+all: kfc.c.o kiss_fft.c.o kiss_fftnd.c.o kiss_fftndr.c.o kiss_fftr.c.o $(KISSFFT_F16_OBJ)
 ifneq ($(KISSFFT_STATIC), 1)
 	$(CC) $(KISSFFTLIB_FLAGS) -o $(KISSFFTLIB_NAME) $^
   ifneq ($(shell uname -s),Darwin)
@@ -229,6 +242,9 @@ install: all
 		kiss_fftnd.h \
 		kiss_fftndr.h \
 		kiss_fftr.h
+ifeq "$(KISSFFT_DATATYPE)" "float"
+	$(INSTALL) -Dt $(ABS_PKGINCLUDEDIR) -m 644 kiss_fft_f16.h
+endif
 	$(INSTALL) -Dt $(ABS_LIBDIR) -m 644 $(KISSFFTLIB_NAME)
 ifneq ($(KISSFFT_STATIC), 1)
   ifneq ($(shell uname -s),Darwin)

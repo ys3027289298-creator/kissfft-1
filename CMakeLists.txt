@@ -125,6 +125,17 @@ add_library(kissfft
   kiss_fftndr.c
   kiss_fftr.c)
 
+#
+# The binary16 input/output layer wraps the float32 engine, so it is built
+# only for the float datatype.  All of its source is additive.
+#
+
+set(KISSFFT_HAS_F16 OFF)
+if(KISSFFT_DATATYPE MATCHES "^float$")
+    target_sources(kissfft PRIVATE kiss_fft_f16.c)
+    set(KISSFFT_HAS_F16 ON)
+endif()
+
 target_include_directories(kissfft PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:${PKGINCLUDEDIR}>)
@@ -312,6 +323,10 @@ install(FILES kiss_fft.h
               kiss_fftndr.h
               kiss_fftr.h
         DESTINATION "${PKGINCLUDEDIR}")
+
+if(KISSFFT_HAS_F16)
+    install(FILES kiss_fft_f16.h DESTINATION "${PKGINCLUDEDIR}")
+endif()
 
 set(KISSFFT_INSTALL_CMAKE "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     CACHE FILEPATH "Install destination of kissfft cmake modules")

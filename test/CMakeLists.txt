@@ -37,9 +37,15 @@ if(KISSFFT_FLOAT)
 else()
     set(fftw3_pkg fftw3)
 endif()
-pkg_check_modules(fftw3 REQUIRED IMPORTED_TARGET ${fftw3_pkg})
-add_kissfft_test_executable(bm_fftw benchfftw.c pstats.c)
-target_link_libraries(bm_fftw PRIVATE PkgConfig::fftw3)
+# The fftw benchmark is optional: without the fftw development package the
+# rest of the suite still configures and runs.
+pkg_check_modules(fftw3 QUIET IMPORTED_TARGET ${fftw3_pkg})
+if(fftw3_FOUND)
+    add_kissfft_test_executable(bm_fftw benchfftw.c pstats.c)
+    target_link_libraries(bm_fftw PRIVATE PkgConfig::fftw3)
+else()
+    message(WARNING "fftw3 (${fftw3_pkg}) not found: skipping the bm_fftw benchmark")
+endif()
 
 add_kissfft_test_executable(st twotonetest.c)
 
@@ -49,6 +55,19 @@ target_compile_definitions(tkfc PRIVATE KFC_TEST)
 add_kissfft_test_executable(ffr twotonetest.c)
 add_kissfft_test_executable(tr test_real.c)
 add_kissfft_test_executable(tsizeval test_size_validation.c)
+
+if(KISSFFT_HAS_F16)
+    # binary16 i/o layer: built with heap accounting so the test can assert the
+    # exact footprint and that a transform allocates nothing.
+    add_kissfft_test_executable(test_f16 test_f16.c ../kiss_fft_f16.c ../kiss_fft.c)
+    target_compile_definitions(test_f16 PRIVATE TEST_F16_WRAP_MALLOC)
+    # The test inspects NaN/infinity bit patterns, which -ffast-math (added
+    # globally by the top-level CMakeLists) lets the compiler assume away.
+    if(CMAKE_C_COMPILER_ID MATCHES "GNU|Clang|AppleClang")
+        target_compile_options(test_f16 PRIVATE -fno-fast-math)
+        target_link_options(test_f16 PRIVATE -Wl,--wrap=malloc -Wl,--wrap=free)
+    endif()
+endif()
 
 add_kissfft_test_executable(next_fast_size next_fast_size.c)
 
@@ -69,7 +88,7 @@ if(KISSFFT_DATATYPE MATCHES "^simd$")
 endif()
 
 find_package(Python3 COMPONENTS Interpreter REQUIRED)
-add_test(NAME testkiss.py COMMAND "${Python3_INTERPRETER}" "${CMAKE_CURRENT_SOURCE_DIR}/testkiss.py")
+add_test(NAME testkiss.py COMMAND "${Python3_EXECUTABLE}" "${CMAKE_CURRENT_SOURCE_DIR}/testkiss.py")
 list(APPEND TESTKISS_PY_ENV "KISSFFT_DATATYPE=${KISSFFT_DATATYPE}")
 list(APPEND TESTKISS_PY_ENV "KISSFFT_OPENMP=${KISSFFT_OPENMP}")
 set_tests_properties(testkiss.py PROPERTIES

@@ -65,6 +65,8 @@ endif
 ifeq "$(KISSFFT_DATATYPE)" "float"
 	# fftw needs to be built with --enable-float to build this lib
 	FFTWLIB = -lfftw3f
+	# binary16 i/o layer: only meaningful for the float32 engine build
+	TESTF16 = tf16-$(KISSFFT_DATATYPE)
 else
 	FFTWLIB = -lfftw3
 endif
@@ -122,6 +124,21 @@ $(TESTREAL): test_real.c
 
 $(TESTSIZEVAL): test_size_validation.c
 	$(CC) -o $@ $(CFLAGS) $(TYPEFLAGS) $< -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
+
+#
+# binary16 i/o layer: self-contained (builds the wrapper and engine directly).
+# The test inspects NaN/infinity bit patterns, so it must be built without the
+# repository's -ffast-math (which lets the compiler assume finite values).
+#
+
+$(TESTF16): test_f16.c ../kiss_fft_f16.c ../kiss_fft_f16.h ../kiss_fft.c
+	$(CC) -o $@ $(filter-out -ffast-math,$(CFLAGS)) $(TYPEFLAGS) \
+		-DTEST_F16_WRAP_MALLOC \
+		test_f16.c ../kiss_fft_f16.c ../kiss_fft.c -lm \
+		-Wl,--wrap=malloc -Wl,--wrap=free
+
+tf16: $(TESTF16)
+	./$(TESTF16)
 
 $(BENCHKISS): benchkiss.c pstats.c
 	$(CC) -o $@ $(CFLAGS) $(TYPEFLAGS)  $^ -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
@@ -193,4 +210,4 @@ endif
 #
 
 clean:
-	rm -f *~ bm-* st-* tr-* tsizeval-* kf-* tkfc-* ff-* fastfilt-* *.pyc *.pyo *.dat testcpp-* testsimd testsimd-* _test_library_dummy _test_library_dummy.c
+	rm -f *~ bm-* st-* tr-* tsizeval-* kf-* tkfc-* ff-* fastfilt-* *.pyc *.pyo *.dat testcpp-* testsimd testsimd-* tf16-* _test_library_dummy _test_library_dummy.c
