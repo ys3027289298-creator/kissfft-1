@@ -1,0 +1,4 @@
+# Build outputs
+pv_stretch
+test_phase_vocoder
+*.o
