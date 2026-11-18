@@ -123,7 +123,8 @@ add_library(kissfft
   kfc.c
   kiss_fftnd.c
   kiss_fftndr.c
-  kiss_fftr.c)
+  kiss_fftr.c
+  kiss_rfft.c)
 
 target_include_directories(kissfft PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
@@ -311,6 +312,7 @@ install(FILES kiss_fft.h
               kiss_fftnd.h
               kiss_fftndr.h
               kiss_fftr.h
+              kiss_rfft.h
         DESTINATION "${PKGINCLUDEDIR}")
 
 set(KISSFFT_INSTALL_CMAKE "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"

@@ -30,6 +30,11 @@ test/tr_float
 test/tr_int16_t
 test/tr_int32_t
 test/tr_simd
+test/trfft_double
+test/trfft_float
+test/trfft_int16_t
+test/trfft_int32_t
+test/trfft_simd
 tools/fastconv_double
 tools/fastconv_float
 tools/fastconv_int16_t
