@@ -313,6 +313,12 @@ install(FILES kiss_fft.h
               kiss_fftr.h
         DESTINATION "${PKGINCLUDEDIR}")
 
+# cepstral pitch detection is only available for scalar floating-point builds
+if(KISSFFT_DATATYPE MATCHES "^float$" OR KISSFFT_DATATYPE MATCHES "^double$")
+    install(FILES tools/kiss_cepstrum.h
+            DESTINATION "${PKGINCLUDEDIR}")
+endif()
+
 set(KISSFFT_INSTALL_CMAKE "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     CACHE FILEPATH "Install destination of kissfft cmake modules")
 mark_as_advanced(KISSFFT_INSTALL_CMAKE)

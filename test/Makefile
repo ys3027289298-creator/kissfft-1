@@ -50,6 +50,12 @@ ifneq ($(KISSFFT_OPENMP),1)
 	TESTKFC = tkfc-$(KISSFFT_DATATYPE)
 	TESTFASTFILT = fastfilt-$(KISSFFT_DATATYPE)
 	TESTCPP = testcpp-$(KISSFFT_DATATYPE)
+# cepstral pitch detection only builds for scalar floating-point types
+ifneq (,$(filter $(KISSFFT_DATATYPE),float double))
+	TESTCEPITCH = tcepitch-$(KISSFFT_DATATYPE)
+else
+	TESTCEPITCH =
+endif
 	TESTSIMD = testsimd
 else
 	BENCHKISS = bm-kiss-$(KISSFFT_DATATYPE)-openmp
@@ -63,6 +69,11 @@ else
 	TESTKFC = tkfc-$(KISSFFT_DATATYPE)-openmp
 	TESTFASTFILT = fastfilt-$(KISSFFT_DATATYPE)-openmp
 	TESTCPP = testcpp-$(KISSFFT_DATATYPE)-openmp
+ifneq (,$(filter $(KISSFFT_DATATYPE),float double))
+	TESTCEPITCH = tcepitch-$(KISSFFT_DATATYPE)-openmp
+else
+	TESTCEPITCH =
+endif
 	TESTSIMD = testsimd-openmp
 	CFLAGS += -fopenmp
 	CXXFLAGS += -fopenmp
@@ -111,7 +122,7 @@ endif
 # Target: "make all"
 #
 
-all: $(BENCHKISS) $(SELFTEST) $(BENCHFFTW) $(TESTREAL) $(TESTSIZEVAL) $(TESTNDRALLOC) $(TESTNDALIGN) $(TESTCUSTOMALLOC) $(TESTKFC) $(TESTFASTFILT)
+all: $(BENCHKISS) $(SELFTEST) $(BENCHFFTW) $(TESTREAL) $(TESTSIZEVAL) $(TESTNDRALLOC) $(TESTNDALIGN) $(TESTCUSTOMALLOC) $(TESTKFC) $(TESTFASTFILT) $(TESTCEPITCH)
 
 #
 # Individual test make rules
@@ -145,6 +156,9 @@ $(BENCHKISS): benchkiss.c pstats.c
 
 $(TESTFASTFILT): ../tools/fftutil.c
 	$(CC) -o $@ $(CFLAGS)  -DKFC_TEST $(TYPEFLAGS) $^ -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
+
+$(TESTCEPITCH): test_cepstrum_pitch.c ../tools/kiss_cepstrum.c
+	$(CC) -o $@ $(CFLAGS) $(TYPEFLAGS) $^ -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
 
 $(BENCHFFTW): benchfftw.c pstats.c
 	$(warning ======attempting to build FFTW benchmark)
@@ -205,6 +219,10 @@ endif
 	@LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(TESTNDALIGN)
 	$(warning ======custom KISS_FFT_MALLOC/KISS_FFT_FREE regression test (type= $(KISSFFT_DATATYPE) ))
 	@LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(TESTCUSTOMALLOC)
+ifneq ($(TESTCEPITCH),)
+	$(warning ======cepstral pitch detection (type= $(KISSFFT_DATATYPE) ))
+	@LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(TESTCEPITCH)
+endif
 	$(warning ======timing test (type=$(KISSFFT_DATATYPE)))
 	@LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(BENCHKISS) -x $(NUMFFTS) -n $(NFFT)
 	@[ -x ./$(BENCHFFTW) ] && LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(BENCHFFTW) -x $(NUMFFTS) -n $(NFFT) || true
@@ -216,4 +234,4 @@ endif
 #
 
 clean:
-	rm -f *~ bm-* st-* tr-* tsizeval-* tndralloc-* tndalign-* tcustalloc-* kf-* tkfc-* ff-* fastfilt-* *.pyc *.pyo *.dat testcpp-* testsimd testsimd-* _test_library_dummy _test_library_dummy.c
+	rm -f *~ bm-* st-* tr-* tsizeval-* tndralloc-* tndalign-* tcustalloc-* kf-* tkfc-* ff-* fastfilt-* tcepitch-* *.pyc *.pyo *.dat testcpp-* testsimd testsimd-* _test_library_dummy _test_library_dummy.c

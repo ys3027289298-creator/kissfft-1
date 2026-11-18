@@ -59,6 +59,13 @@ add_kissfft_test_executable(next_fast_size next_fast_size.c)
 
 add_kissfft_test_executable(testcpp testcpp.cc)
 
+# cepstral pitch detection needs the scalar floating-point log() path
+if(KISSFFT_DATATYPE MATCHES "^float$" OR KISSFFT_DATATYPE MATCHES "^double$")
+    add_kissfft_test_executable(tcepitch
+        test_cepstrum_pitch.c
+        ../tools/kiss_cepstrum.c)
+endif()
+
 if(KISSFFT_DATATYPE MATCHES "^simd$")
     add_kissfft_test_executable(tsimd test_simd.c)
     target_compile_definitions(tsimd PRIVATE USE_SIMD)
