@@ -43,6 +43,7 @@ ifneq ($(KISSFFT_OPENMP),1)
 	BENCHFFTW = bm-fftw-$(KISSFFT_DATATYPE)
 	SELFTEST = st-$(KISSFFT_DATATYPE)
 	TESTREAL = tr-$(KISSFFT_DATATYPE)
+	TESTPITCH = tpitch-$(KISSFFT_DATATYPE)
 	TESTSIZEVAL = tsizeval-$(KISSFFT_DATATYPE)
 	TESTNDRALLOC = tndralloc-$(KISSFFT_DATATYPE)
 	TESTNDALIGN = tndalign-$(KISSFFT_DATATYPE)
@@ -56,6 +57,7 @@ else
 	BENCHFFTW = bm-fftw-$(KISSFFT_DATATYPE)-openmp
 	SELFTEST = st-$(KISSFFT_DATATYPE)-openmp
 	TESTREAL = tr-$(KISSFFT_DATATYPE)-openmp
+	TESTPITCH = tpitch-$(KISSFFT_DATATYPE)-openmp
 	TESTSIZEVAL = tsizeval-$(KISSFFT_DATATYPE)-openmp
 	TESTNDRALLOC = tndralloc-$(KISSFFT_DATATYPE)-openmp
 	TESTNDALIGN = tndalign-$(KISSFFT_DATATYPE)-openmp
@@ -111,7 +113,7 @@ endif
 # Target: "make all"
 #
 
-all: $(BENCHKISS) $(SELFTEST) $(BENCHFFTW) $(TESTREAL) $(TESTSIZEVAL) $(TESTNDRALLOC) $(TESTNDALIGN) $(TESTCUSTOMALLOC) $(TESTKFC) $(TESTFASTFILT)
+all: $(BENCHKISS) $(SELFTEST) $(BENCHFFTW) $(TESTREAL) $(TESTPITCH) $(TESTSIZEVAL) $(TESTNDRALLOC) $(TESTNDALIGN) $(TESTCUSTOMALLOC) $(TESTKFC) $(TESTFASTFILT)
 
 #
 # Individual test make rules
@@ -124,6 +126,9 @@ $(TESTKFC): ../kfc.c
 	$(CC) -o $@ $(CFLAGS)  -DKFC_TEST $(TYPEFLAGS) $^ -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
 
 $(TESTREAL): test_real.c
+	$(CC) -o $@ $(CFLAGS) $(TYPEFLAGS) $< -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
+
+$(TESTPITCH): test_pitch.c
 	$(CC) -o $@ $(CFLAGS) $(TYPEFLAGS) $< -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
 
 $(TESTSIZEVAL): test_size_validation.c
@@ -197,6 +202,8 @@ endif
 	@LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(SELFTEST)
 	$(warning ======real FFT (type= $(KISSFFT_DATATYPE) ))
 	@LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(TESTREAL)
+	$(warning ======spectral peaks and harmonic tracking (type= $(KISSFFT_DATATYPE) ))
+	@LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(TESTPITCH)
 	$(warning ======allocation size validation regression test (type= $(KISSFFT_DATATYPE) ))
 	@LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(TESTSIZEVAL)
 	$(warning ======kiss_fftndr allocation regression test (type= $(KISSFFT_DATATYPE) ))
@@ -216,4 +223,4 @@ endif
 #
 
 clean:
-	rm -f *~ bm-* st-* tr-* tsizeval-* tndralloc-* tndalign-* tcustalloc-* kf-* tkfc-* ff-* fastfilt-* *.pyc *.pyo *.dat testcpp-* testsimd testsimd-* _test_library_dummy _test_library_dummy.c
+	rm -f *~ bm-* st-* tr-* tpitch-* tsizeval-* tndralloc-* tndalign-* tcustalloc-* kf-* tkfc-* ff-* fastfilt-* *.pyc *.pyo *.dat testcpp-* testsimd testsimd-* _test_library_dummy _test_library_dummy.c

@@ -120,6 +120,7 @@ message(STATUS "PKGINCLUDEDIR is ${PKGINCLUDEDIR}")
 
 add_library(kissfft
   kiss_fft.c
+  kiss_pitch.c
   kfc.c
   kiss_fftnd.c
   kiss_fftndr.c
@@ -307,6 +308,7 @@ install(TARGETS kissfft EXPORT kissfft
     RUNTIME DESTINATION "${CMAKE_INSTALL_BINDIR}")
 
 install(FILES kiss_fft.h
+              kiss_pitch.h
               kissfft.hh
               kiss_fftnd.h
               kiss_fftndr.h

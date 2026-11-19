@@ -48,6 +48,7 @@ target_compile_definitions(tkfc PRIVATE KFC_TEST)
 
 add_kissfft_test_executable(ffr twotonetest.c)
 add_kissfft_test_executable(tr test_real.c)
+add_kissfft_test_executable(tpitch test_pitch.c)
 add_kissfft_test_executable(tsizeval test_size_validation.c)
 add_kissfft_test_executable(tndralloc test_fftndr_alloc.c)
 # includes ../kiss_fftr.c, ../kiss_fftnd.c and ../kiss_fftndr.c to reach their private structs

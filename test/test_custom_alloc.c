@@ -14,11 +14,11 @@
  * and free() are redirected while the library sources are compiled, to catch
  * code that bypasses the overridable allocator:
  *  1. every allocation made by kiss_fft_alloc, kiss_fftr_alloc,
- *     kiss_fftnd_alloc, kiss_fftndr_alloc and kfc_fft goes through
- *     KISS_FFT_MALLOC (no raw malloc)
- *  2. kiss_fft_free, kiss_fftr_free, kiss_fftndr_free and kfc_cleanup only
- *     release blocks that KISS_FFT_MALLOC returned, and do so through
- *     KISS_FFT_FREE (no raw free)
+ *     kiss_fftnd_alloc, kiss_fftndr_alloc, kiss_pitch_alloc and kfc_fft goes
+ *     through KISS_FFT_MALLOC (no raw malloc)
+ *  2. kiss_fft_free, kiss_fftr_free, kiss_fftndr_free, kiss_pitch_free and
+ *     kfc_cleanup only release blocks that KISS_FFT_MALLOC returned, and do
+ *     so through KISS_FFT_FREE (no raw free)
  *  3. nothing is left allocated afterwards
  *  4. with USE_SIMD, overriding the allocator must still compile (the
  *     KISS_FFT_ALIGN_CHECK / KISS_FFT_ALIGN_SIZE_UP macros must stay defined)
@@ -169,6 +169,7 @@ static void raw_free(void *p)
 #include "../kiss_fftr.c"
 #include "../kiss_fftnd.c"
 #include "../kiss_fftndr.c"
+#include "../kiss_pitch.c"
 #include "../kfc.c"
 #if defined(__GNUC__) || defined(__clang__)
 # pragma GCC diagnostic pop
@@ -315,6 +316,26 @@ static void test_kiss_fftndr(void)
     end_scenario("kiss_fftndr");
 }
 
+static void test_kiss_pitch(void)
+{
+    kiss_fft_scalar in[256];
+    kiss_pitch_frame frame;
+    kiss_pitch_peak peaks[8];
+    kiss_pitch_cfg cfg;
+
+    memset(in, 0, sizeof(in));
+    if (!kiss_pitch_available())
+        return; /* USE_SIMD builds have no scalar sample access */
+    begin_scenario();
+    cfg = kiss_pitch_alloc(256, 8000.0, NULL, NULL);
+    expect_wrapper_alloc("kiss_pitch_alloc");
+    if (cfg != NULL) {
+        (void)kiss_pitch_process(cfg, in, &frame, peaks, 8);
+        kiss_pitch_free(cfg);
+    }
+    end_scenario("kiss_pitch");
+}
+
 static void test_kfc(void)
 {
     kiss_fft_cpx in[8], out[8];
@@ -335,6 +356,7 @@ int main(void)
     test_kiss_fftr();
     test_kiss_fftnd();
     test_kiss_fftndr();
+    test_kiss_pitch();
     test_kfc();
     printf("%s\n", failures ? "FAIL" : "PASS");
     return failures ? 1 : 0;

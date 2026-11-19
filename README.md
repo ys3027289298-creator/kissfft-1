@@ -44,6 +44,40 @@ You can do other cool stuff with the extras you'll find in tools/
 The core fft and most tools/ code can be compiled to use float, double,
  Q15 short or Q31 samples. The default is float.
 
+### Spectral peaks and harmonic tracking (kiss_pitch)
+
+Pitch tracking on top of `kiss_fftr()` is available in `kiss_pitch.h`.
+Each frame goes through windowing, peak detection with parabolic
+interpolation, harmonic grouping into cross-frame tracks, and a
+fundamental-frequency estimate with a confidence value:
+
+```c
+    #include "kiss_pitch.h"
+
+    kiss_pitch_cfg cfg = kiss_pitch_alloc(4096, 44100.0, NULL, NULL);
+    kiss_pitch_frame frame;
+    kiss_pitch_peak peaks[16];
+
+    while (have_another_frame) {
+        int voiced = kiss_pitch_process(cfg, samples, &frame, peaks, 16);
+        if (voiced)
+            printf("%.3f Hz (confidence %.2f)\n", frame.f0_hz, frame.confidence);
+        /* peaks[0..frame.n_peaks-1] holds every partial with its
+           harmonic number and a track id that persists across frames */
+    }
+
+    kiss_pitch_free(cfg);
+```
+
+The search range (default 50..2000 Hz), the harmonic limit and the peak
+detection floor are configurable through `kiss_pitch_set_range()`,
+`kiss_pitch_set_max_harmonics()` and `kiss_pitch_set_detection()`.
+Once a fundamental is established it is protected against octave jumps:
+a different octave must win on score for several consecutive frames.
+
+The analysis reads individual sample values, so it is not available in
+`USE_SIMD` builds; `kiss_pitch_available()` reports whether a build can use it.
+
 ### Forward and inverse scaling
 
 For floating-point builds (`float` or `double`), neither direction is
