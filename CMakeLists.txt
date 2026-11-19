@@ -125,6 +125,12 @@ add_library(kissfft
   kiss_fftndr.c
   kiss_fftr.c)
 
+# Hilbert transform / instantaneous-frequency tracking needs atan2 and has
+# no fixed-point equivalent, so it is part of the float/double builds only
+if(KISSFFT_DATATYPE MATCHES "^float$" OR KISSFFT_DATATYPE MATCHES "^double$")
+    target_sources(kissfft PRIVATE kiss_hilbert.c)
+endif()
+
 target_include_directories(kissfft PUBLIC
     $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>
     $<INSTALL_INTERFACE:${PKGINCLUDEDIR}>)
@@ -312,6 +318,11 @@ install(FILES kiss_fft.h
               kiss_fftndr.h
               kiss_fftr.h
         DESTINATION "${PKGINCLUDEDIR}")
+
+# floating-point-only API, installed only for the builds that ship it
+if(KISSFFT_DATATYPE MATCHES "^float$" OR KISSFFT_DATATYPE MATCHES "^double$")
+    install(FILES kiss_hilbert.h DESTINATION "${PKGINCLUDEDIR}")
+endif()
 
 set(KISSFFT_INSTALL_CMAKE "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}"
     CACHE FILEPATH "Install destination of kissfft cmake modules")

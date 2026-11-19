@@ -51,6 +51,10 @@ ifneq ($(KISSFFT_OPENMP),1)
 	TESTFASTFILT = fastfilt-$(KISSFFT_DATATYPE)
 	TESTCPP = testcpp-$(KISSFFT_DATATYPE)
 	TESTSIMD = testsimd
+	# Hilbert tracking exists for floating-point builds only
+	ifeq "$(filter $(KISSFFT_DATATYPE),float double)" "$(KISSFFT_DATATYPE)"
+		TESTHILBERT = thilbert-$(KISSFFT_DATATYPE)
+	endif
 else
 	BENCHKISS = bm-kiss-$(KISSFFT_DATATYPE)-openmp
 	BENCHFFTW = bm-fftw-$(KISSFFT_DATATYPE)-openmp
@@ -64,6 +68,10 @@ else
 	TESTFASTFILT = fastfilt-$(KISSFFT_DATATYPE)-openmp
 	TESTCPP = testcpp-$(KISSFFT_DATATYPE)-openmp
 	TESTSIMD = testsimd-openmp
+	# Hilbert tracking exists for floating-point builds only
+	ifeq "$(filter $(KISSFFT_DATATYPE),float double)" "$(KISSFFT_DATATYPE)"
+		TESTHILBERT = thilbert-$(KISSFFT_DATATYPE)-openmp
+	endif
 	CFLAGS += -fopenmp
 	CXXFLAGS += -fopenmp
 endif
@@ -111,7 +119,7 @@ endif
 # Target: "make all"
 #
 
-all: $(BENCHKISS) $(SELFTEST) $(BENCHFFTW) $(TESTREAL) $(TESTSIZEVAL) $(TESTNDRALLOC) $(TESTNDALIGN) $(TESTCUSTOMALLOC) $(TESTKFC) $(TESTFASTFILT)
+all: $(BENCHKISS) $(SELFTEST) $(BENCHFFTW) $(TESTREAL) $(TESTSIZEVAL) $(TESTNDRALLOC) $(TESTNDALIGN) $(TESTCUSTOMALLOC) $(TESTKFC) $(TESTFASTFILT) $(TESTHILBERT)
 
 #
 # Individual test make rules
@@ -131,6 +139,11 @@ $(TESTSIZEVAL): test_size_validation.c
 
 $(TESTNDRALLOC): test_fftndr_alloc.c
 	$(CC) -o $@ $(CFLAGS) $(TYPEFLAGS) $< -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
+
+ifneq ($(TESTHILBERT),)
+$(TESTHILBERT): test_hilbert.c
+	$(CC) -o $@ $(CFLAGS) $(TYPEFLAGS) $< -L.. -l$(KISSFFTLIB_SHORTNAME) -lm
+endif
 
 # includes ../kiss_fftr.c, ../kiss_fftnd.c and ../kiss_fftndr.c to reach their private structs
 $(TESTNDALIGN): test_nd_alignment.c ../kiss_fftr.c ../kiss_fftnd.c ../kiss_fftndr.c
@@ -203,6 +216,10 @@ endif
 	@LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(TESTNDRALLOC)
 	$(warning ======multi-dimensional FFT state alignment regression test (type= $(KISSFFT_DATATYPE) ))
 	@LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(TESTNDALIGN)
+ifneq ($(TESTHILBERT),)
+	$(warning ======Hilbert transform / instantaneous frequency test (type= $(KISSFFT_DATATYPE) ))
+	@LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(TESTHILBERT)
+endif
 	$(warning ======custom KISS_FFT_MALLOC/KISS_FFT_FREE regression test (type= $(KISSFFT_DATATYPE) ))
 	@LD_LIBRARY_PATH="$(LD_LIBRARY_PATH):.." ./$(TESTCUSTOMALLOC)
 	$(warning ======timing test (type=$(KISSFFT_DATATYPE)))
@@ -216,4 +233,4 @@ endif
 #
 
 clean:
-	rm -f *~ bm-* st-* tr-* tsizeval-* tndralloc-* tndalign-* tcustalloc-* kf-* tkfc-* ff-* fastfilt-* *.pyc *.pyo *.dat testcpp-* testsimd testsimd-* _test_library_dummy _test_library_dummy.c
+	rm -f *~ bm-* st-* tr-* tsizeval-* tndralloc-* tndalign-* tcustalloc-* kf-* tkfc-* ff-* fastfilt-* thilbert-* *.pyc *.pyo *.dat testcpp-* testsimd testsimd-* _test_library_dummy _test_library_dummy.c

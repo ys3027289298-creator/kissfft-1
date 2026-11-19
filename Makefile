@@ -18,7 +18,7 @@
 #
 
 export KFVER_MAJOR = 131
-export KFVER_MINOR = 1
+export KFVER_MINOR = 2
 export KFVER_PATCH = 0
 
 #
@@ -204,7 +204,13 @@ export TYPEFLAGS
 # Target: "make all"
 #
 
-all: kfc.c.o kiss_fft.c.o kiss_fftnd.c.o kiss_fftndr.c.o kiss_fftr.c.o
+# Hilbert transform / instantaneous-frequency tracking: floating point only
+HILBERT_OBJ =
+ifeq "$(filter $(KISSFFT_DATATYPE),float double)" "$(KISSFFT_DATATYPE)"
+	HILBERT_OBJ = kiss_hilbert.c.o
+endif
+
+all: kfc.c.o kiss_fft.c.o kiss_fftnd.c.o kiss_fftndr.c.o kiss_fftr.c.o $(HILBERT_OBJ)
 ifneq ($(KISSFFT_STATIC), 1)
 	$(CC) $(KISSFFTLIB_FLAGS) -o $(KISSFFTLIB_NAME) $^
   ifneq ($(shell uname -s),Darwin)
@@ -229,6 +235,9 @@ install: all
 		kiss_fftnd.h \
 		kiss_fftndr.h \
 		kiss_fftr.h
+ifneq ($(HILBERT_OBJ),)
+	$(INSTALL) -Dt $(ABS_PKGINCLUDEDIR) -m 644 kiss_hilbert.h
+endif
 	$(INSTALL) -Dt $(ABS_LIBDIR) -m 644 $(KISSFFTLIB_NAME)
 ifneq ($(KISSFFT_STATIC), 1)
   ifneq ($(shell uname -s),Darwin)

@@ -67,6 +67,34 @@ number of complex frequency bins (`nfft / 2 + 1`).
 Fixed-point builds scale internally in both directions to prevent overflow;
 do not apply the floating-point normalization recipe to them.
 
+### Hilbert transform and instantaneous frequency
+
+The floating-point builds additionally ship `kiss_hilbert.h`, which turns a
+real frame into its analytic signal and tracks the instantaneous frequency
+sample by sample, instead of following a spectral peak bin:
+
+```c
+    #include "kiss_hilbert.h"
+    kiss_hilbert_cfg cfg = kiss_hilbert_alloc(nfft, zero_pad, 0, 0);
+
+    kiss_fft_scalar f_inst[nfft - 1]; /* cycles per sample, x sampling rate for Hz */
+    int margin;
+    kiss_hilbert_track(cfg, frame, NULL, f_inst, &margin);
+    /* f_inst[margin .. nfft-1-margin) is the phase-continuous, 0.5%-accurate region */
+
+    kiss_hilbert_free(cfg);
+```
+
+Each frame is Hann windowed and zero padded; the analytic signal is built
+with a frequency-domain Hilbert filter and the instantaneous frequency is the
+wrapped phase difference of adjacent analytic samples (`atan2`, no explicit
+unwrapping). The window drives the signal amplitude toward zero at both frame
+edges, so `kiss_hilbert_track` reports a per-frame `margin` (about one signal
+period at the lowest frequency present) outside which the phase readings are
+not trustworthy. For continuous tracking, use overlapping frames with a hop
+of `nfft - 2*margin` so every output sample stays inside a trusted region.
+This module is not built for the fixed-point datatypes.
+
 ## BUILDING:
 
 There are two functionally-equivalent build systems supported by kissfft:
